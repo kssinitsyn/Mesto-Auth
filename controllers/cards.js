@@ -17,7 +17,18 @@ module.exports.getAllCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
-    .then((card) => res.send(card !== null ? { data: card } : { data: 'Нечего удалять' }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка при удалении карточки' }));
+  Card.findById(req.params.id)
+  // eslint-disable-next-line consistent-return
+    .then((card) => {
+      if (!card) {
+        return Promise.reject(new Error('Данные отсутствуют'));
+      }
+      if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) {
+        return Promise.reject(new Error('Вы не являетесь создателем данного изображения'));
+      }
+      Card.remove(card)
+        .then((cardToDelete) => res.send(cardToDelete !== null ? { data: card } : { data: 'Нечего удалять' }))
+        .catch((err) => res.status(500).send({ message: err.message }));
+    })
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
