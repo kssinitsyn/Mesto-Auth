@@ -4,7 +4,7 @@ const User = require('../models/user');
 
 
 // eslint-disable-next-line consistent-return
-module.exports.createUser = (req, res) => {
+const createUser = (req, res) => {
   if (Object.keys(req.body).length === 0) {
     return res.status(400).send({ message: 'Запрос пустой' });
   }
@@ -22,7 +22,7 @@ module.exports.createUser = (req, res) => {
     .catch((err) => res.status(400).send({ message: `Ошибка при создании пользователя - Error: ${err}` }));
 };
 
-module.exports.login = (req, res) => {
+const login = (req, res) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -43,13 +43,13 @@ module.exports.login = (req, res) => {
     });
 };
 
-module.exports.getAllUsers = (req, res) => {
+const getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка при поиске всех пользователей' }));
 };
 
-module.exports.getSingleUser = (req, res) => {
+const getSingleUser = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
       if (user == null) {
@@ -59,4 +59,8 @@ module.exports.getSingleUser = (req, res) => {
       }
     })
     .catch(() => res.status(500).send({ message: 'Нет пользователя с таким id' }));
+};
+
+module.exports = {
+  createUser, login, getAllUsers, getSingleUser,
 };
